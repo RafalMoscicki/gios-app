@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @CrossOrigin(origins = "*")
@@ -29,5 +30,15 @@ public class GiosController {
     @GetMapping("/report")
     public Collection<GiosInfo> getReport(@RequestParam int cityId) {
         return service.getReport(cityId);
+    }
+
+    @GetMapping("/report/avg")
+    public GiosInfo getAvgReport(@RequestParam int cityId) {
+        return service.getAverageReport(cityId);
+    }
+
+    @GetMapping("/report/all")
+    public List<GiosInfo> getAvgReportForAllCities() {
+        return service.getAverageReportsForAllCities();
     }
 }

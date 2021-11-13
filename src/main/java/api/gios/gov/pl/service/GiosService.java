@@ -10,6 +10,7 @@ import api.gios.gov.pl.domain.index.StIndexLevel;
 import api.gios.gov.pl.domain.sensor.GiosSensorsDto;
 import api.gios.gov.pl.domain.sensor.ParamCode;
 import api.gios.gov.pl.domain.station.GiosStationDto;
+import api.gios.gov.pl.exception.CityNotFoundException;
 import api.gios.gov.pl.exception.StationNotFoundException;
 import api.gios.gov.pl.gios.cache.GiosCache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,23 +96,57 @@ public class GiosService {
     }
 
     public GiosInfo getAverageReport(int cityId) {
-        getStationIds(cityId).stream()
+        Map<ParamCode, Double> averageValues = getStationIds(cityId).stream()
                 .map(this::getInfo)
-                .forEach(report -> report.getValues().values()
-                        .stream()
-                        .mapToDouble(GiosDetailInfo::getValue)
-                        .average()
-                        .orElse(0.0)
-                );
-
-        getReport(cityId).forEach(report -> report.getValues().values()
+                .map(GiosInfo::getValues)
+                .flatMap(x -> x.entrySet().stream())
+                .collect(Collectors.groupingBy(Map.Entry::getKey))
+                .entrySet()
                 .stream()
-                .mapToDouble(GiosDetailInfo::getValue)
-                .average()
-                .orElse(0.0)
-        );
+                .collect(
+                    Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
+                        .map(e -> e.getValue().getValue())
+                        .filter(Objects::nonNull)
+                        .mapToDouble(x -> x).average()
+                        .orElse(0)
+                    )
+                );
+        Map<ParamCode, Double> averageIndexLevels = getStationIds(cityId).stream()
+                .map(this::getInfo)
+                .map(GiosInfo::getValues)
+                .flatMap(x -> x.entrySet().stream())
+                .collect(Collectors.groupingBy(Map.Entry::getKey))
+                .entrySet()
+                .stream()
+                .collect(
+                        Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
+                                .map(Map.Entry::getValue)
+                                .filter(Objects::nonNull)
+                                .map(GiosDetailInfo::getLevel)
+                                .filter(Objects::nonNull)
+                                .map(IndexLevel::getValue)
+                                .filter(x -> x != -1)
+                                .mapToDouble(x -> x).average()
+                                .orElse(-1)
+                        )
+                );
+        GiosInfo giosInfo = new GiosInfo(getCityName(cityId));
+        averageValues.forEach((key, value) -> giosInfo.add(key, new GiosDetailInfo(value, IndexLevel.getByValue((int) Math.round(averageIndexLevels.get(key))))));
+        return giosInfo;
 
-        return new GiosInfo()
     }
 
+    public List<GiosInfo> getAverageReportsForAllCities() {
+        return getAllCities().stream()
+                .map(city -> getAverageReport(city.getId()))
+                .collect(Collectors.toList());
+    }
+
+    private String getCityName(int cityId) {
+        return getAllCities().stream()
+                .filter(city -> city.getId() == cityId)
+                .map(CityDto::getCityName)
+                .findFirst()
+                .orElseThrow(() -> new CityNotFoundException(cityId));
+    }
 }
