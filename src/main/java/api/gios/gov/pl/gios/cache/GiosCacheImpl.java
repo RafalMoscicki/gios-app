@@ -4,19 +4,20 @@ import api.gios.gov.pl.domain.data.GiosDataDto;
 import api.gios.gov.pl.domain.index.GiosIndexDto;
 import api.gios.gov.pl.domain.sensor.GiosSensorsDto;
 import api.gios.gov.pl.domain.station.GiosStationDto;
-import api.gios.gov.pl.gios.cache.GiosCache;
 import api.gios.gov.pl.gios.client.GiosClient;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Component
+@Slf4j
 public class GiosCacheImpl implements GiosCache {
 
-    @Autowired
     private final GiosClient client;
 
     private List<GiosStationDto> stations;
@@ -27,61 +28,65 @@ public class GiosCacheImpl implements GiosCache {
 
     private Map<Integer, GiosIndexDto> indices;
 
+    @Autowired
+    public GiosCacheImpl(GiosClient client) {
+        this.client = client;
+        loadGiosData();
+    }
+
     @Override
     public List<GiosStationDto> getStations() {
-        if (stations == null) {
-            loadStations();
-        }
         return stations;
     }
 
     @Override
     public Map<Integer, List<GiosSensorsDto>> getSensors() {
-        if (sensors == null) {
-            sensors = new HashMap<>();
-            loadSensors();
-        }
         return sensors;
     }
 
     @Override
     public Map<Integer, GiosDataDto> getData() {
-        if (data == null) {
-            data = new HashMap<>();
-            loadData();
-        }
         return data;
     }
 
     @Override
     public Map<Integer, GiosIndexDto> getIndices() {
-        if (indices == null) {
-            indices = new HashMap<>();
-            loadIndices();
-        }
         return indices;
     }
 
-    @Override
-    public void loadStations() {
-        stations = client.getGiosStations();
+    private List<GiosStationDto> loadStations() {
+        return client.getGiosStations();
     }
 
-    @Override
-    public void loadSensors() {
-        getStations().forEach(station -> sensors.put(station.getId(), client.getGiosSensors(station.getId())));
+    private Map<Integer, List<GiosSensorsDto>> loadSensors(List<GiosStationDto> stations) {
+        return stations.stream()
+                .collect(Collectors.toMap(GiosStationDto::getId, station -> client.getGiosSensors(station.getId())));
     }
 
-    @Override
-    public void loadData() {
-        getSensors().values().stream()
+    private Map<Integer, GiosDataDto> loadData(Map<Integer, List<GiosSensorsDto>> sensors) {
+        return sensors.values().stream()
                 .flatMap(Collection::stream)
-                .forEach(sensor -> data.put(sensor.getId(), client.getGiosData(sensor.getId())));
-//        getSensors().values().forEach(sensorId -> data.put(sensorId, client.getGiosData(sensorId)));
+                .collect(Collectors.toMap(GiosSensorsDto::getId, sensor -> client.getGiosData(sensor.getId())));
+    }
+
+    private Map<Integer, GiosIndexDto> loadIndices(List<GiosStationDto> stations) {
+        return stations.stream()
+                .collect(Collectors.toMap(GiosStationDto::getId, station -> client.getGiosIndex(station.getId())));
     }
 
     @Override
-    public void loadIndices() {
-        getStations().forEach(station -> indices.put(station.getId(), client.getGiosIndex(station.getId())));
+    public void loadGiosData() {
+        log.info("started loading data to cache");
+        List<GiosStationDto> loadedStations = loadStations();
+        Map<Integer, List<GiosSensorsDto>> loadedSensors = loadSensors(loadedStations);
+        Map<Integer, GiosDataDto> loadedData = loadData(loadedSensors);
+        Map<Integer, GiosIndexDto> loadedIndices = loadIndices(loadedStations);
+        synchronized (this) {
+            stations = loadedStations;
+            sensors = loadedSensors;
+            data = loadedData;
+            indices = loadedIndices;
+        }
+        log.info("ended loading data to cache");
     }
 }

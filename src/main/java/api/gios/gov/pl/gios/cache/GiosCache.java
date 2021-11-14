@@ -5,7 +5,6 @@ import api.gios.gov.pl.domain.index.GiosIndexDto;
 import api.gios.gov.pl.domain.sensor.GiosSensorsDto;
 import api.gios.gov.pl.domain.station.GiosStationDto;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +18,6 @@ public interface GiosCache {
 
     Map<Integer, GiosIndexDto> getIndices();
 
-    void loadStations();
+    void loadGiosData();
 
-    void loadSensors();
-
-    void loadData();
-
-    void loadIndices();
 }

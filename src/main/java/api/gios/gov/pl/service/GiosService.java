@@ -9,6 +9,7 @@ import api.gios.gov.pl.domain.index.IndexLevel;
 import api.gios.gov.pl.domain.index.StIndexLevel;
 import api.gios.gov.pl.domain.sensor.GiosSensorsDto;
 import api.gios.gov.pl.domain.sensor.ParamCode;
+import api.gios.gov.pl.domain.sensor.ParamCodeDto;
 import api.gios.gov.pl.domain.station.GiosStationDto;
 import api.gios.gov.pl.exception.CityNotFoundException;
 import api.gios.gov.pl.exception.StationNotFoundException;
@@ -148,5 +149,9 @@ public class GiosService {
                 .map(CityDto::getCityName)
                 .findFirst()
                 .orElseThrow(() -> new CityNotFoundException(cityId));
+    }
+
+    public List<ParamCodeDto> getParamCodes() {
+        return Arrays.stream(ParamCode.values()).map(ParamCodeDto::new).collect(Collectors.toList());
     }
 }

@@ -70,22 +70,7 @@ public class MockGiosCache implements GiosCache {
     }
 
     @Override
-    public void loadStations() {
-
-    }
-
-    @Override
-    public void loadSensors() {
-
-    }
-
-    @Override
-    public void loadData() {
-
-    }
-
-    @Override
-    public void loadIndices() {
+    public void loadGiosData() {
 
     }
 }

@@ -2,6 +2,7 @@ package api.gios.gov.pl.controller;
 
 import api.gios.gov.pl.domain.CityDto;
 import api.gios.gov.pl.domain.GiosInfo;
+import api.gios.gov.pl.domain.sensor.ParamCodeDto;
 import api.gios.gov.pl.service.GiosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class GiosController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/city")
     public Set<CityDto> getCities() {
         return service.getAllCities();
     }
@@ -40,5 +41,10 @@ public class GiosController {
     @GetMapping("/report/all")
     public List<GiosInfo> getAvgReportForAllCities() {
         return service.getAverageReportsForAllCities();
+    }
+
+    @GetMapping("/codes")
+    public List<ParamCodeDto> getParamCodes() {
+        return service.getParamCodes();
     }
 }

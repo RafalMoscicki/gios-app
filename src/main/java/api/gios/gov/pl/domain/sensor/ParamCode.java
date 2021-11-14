@@ -3,15 +3,13 @@ package api.gios.gov.pl.domain.sensor;
 import java.util.Arrays;
 
 public enum ParamCode {
-
-    C6H6("benzen", "c6h6IndexLevel"),
-    CO("tlenek węgla", "coIndexLevel"),
-    NO2("dwutlenek azotu", "no2IndexLevel"),
-    O3("ozon", "o3IndexLevel"),
-    SO2("dwutlenek siarki", "so2IndexLevel"),
     PM10("pył zawieszony PM10", "pm10IndexLevel"),
-    PM2_5("pył zawieszony PM2.5", "pm2.5IndexLevel"),
-    PM25("pył zawieszony PM25", "pm25IndexLevel");
+    PM2_5("pył zawieszony PM2.5", "pm25IndexLevel"),
+    NO2("dwutlenek azotu", "no2IndexLevel"),
+    SO2("dwutlenek siarki", "so2IndexLevel"),
+    CO("tlenek węgla", "coIndexLevel"),
+    C6H6("benzen", "c6h6IndexLevel"),
+    O3("ozon", "o3IndexLevel");
 
     private final String description;
 
@@ -34,5 +32,9 @@ public enum ParamCode {
                 .filter(paramLevel -> paramLevel.fieldName.equals(fieldName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
