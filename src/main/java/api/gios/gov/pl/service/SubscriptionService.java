@@ -1,5 +1,6 @@
 package api.gios.gov.pl.service;
 
+import api.gios.gov.pl.config.SubscriptionConfigConfig;
 import api.gios.gov.pl.domain.subscribtion.Subscription;
 import api.gios.gov.pl.domain.subscribtion.SubscriptionDto;
 import api.gios.gov.pl.domain.subscribtion.SubscriptionStatus;
@@ -24,6 +25,12 @@ public class SubscriptionService {
     @Autowired
     private SubscriptionRepository repository;
 
+    @Autowired
+    private GiosEmailService giosEmailService;
+
+    @Autowired
+    private SubscriptionConfigConfig subscriptionConfigConfig;
+
     public void subscribe(SubscriptionDto subscription) {
         List<Subscription> byEmailAndCityId = repository.findByEmailAndCityId(
                 subscription.getEmail(),
@@ -34,15 +41,18 @@ public class SubscriptionService {
         Subscription newSubscription = new Subscription(subscription.getCityId(), subscription.getEmail(), SubscriptionStatus.PENDING, UUID.randomUUID().toString());
         log.info("subscription " + subscription + " created");
         repository.save(newSubscription);
+        String link = subscriptionConfigConfig.getSubscriptionUrl() + "/confirmation?subscriptionId=" + newSubscription.getId() + "&token=" + newSubscription.getToken();
+        giosEmailService.sendConfirmationEmail(newSubscription, link);
     }
 
-    public void confirm(long subscriptionId, String token) {
+    public String confirm(long subscriptionId, String token) {
         Optional<Subscription> maybeSubscription = repository.findById(subscriptionId);
         if (maybeSubscription.isPresent()) {
             Subscription subscription = maybeSubscription.get();
-            if (subscription.getToken().equals(token)) {
+            if (subscription.getToken().substring(0, 36).equals(token)) {
                 subscription.setSubscriptionStatus(SubscriptionStatus.ACTIVE);
                 log.info("subscription " + subscriptionId + " confirmed");
+                return "Dzięki za suba";
             } else {
                 throw new SubscriptionTokenNotValidException(token);
             }
@@ -51,13 +61,14 @@ public class SubscriptionService {
         }
     }
 
-    public void unsubscribe(long subscriptionId, String token) {
+    public String unsubscribe(long subscriptionId, String token) {
         Optional<Subscription> maybeSubscription = repository.findById(subscriptionId);
         if (maybeSubscription.isPresent()) {
             Subscription subscription = maybeSubscription.get();
-            if (subscription.getToken().equals(token)) {
+            if (subscription.getToken().substring(0, 36).equals(token)) {
                 log.info("subscription " + subscriptionId + " deleted");
                 repository.deleteById(subscriptionId);
+                return "Subscrybcja wycofana";
             } else {
                 throw new SubscriptionTokenNotValidException(token);
             }
@@ -66,3 +77,4 @@ public class SubscriptionService {
         }
     }
 }
+    

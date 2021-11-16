@@ -10,6 +10,7 @@ public class ParamCodeDto {
 
     public ParamCodeDto(ParamCode paramCode) {
         this.code = paramCode.name();
-        this.description = paramCode.getDescription().substring(0, 1).toUpperCase() + paramCode.getDescription().substring(1);
+        this.description = paramCode.getDescription().substring(0, 1).toUpperCase()
+                + paramCode.getDescription().substring(1);
     }
 }

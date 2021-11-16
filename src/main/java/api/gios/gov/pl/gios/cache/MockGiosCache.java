@@ -1,4 +1,4 @@
-package api.gios.gov.pl.gios;
+package api.gios.gov.pl.gios.cache;
 
 import api.gios.gov.pl.domain.data.GiosDataDto;
 import api.gios.gov.pl.domain.data.GiosValuesDto;
@@ -8,19 +8,22 @@ import api.gios.gov.pl.domain.sensor.GiosParamDto;
 import api.gios.gov.pl.domain.sensor.GiosSensorsDto;
 import api.gios.gov.pl.domain.sensor.ParamCode;
 import api.gios.gov.pl.domain.station.GiosCityDto;
+import api.gios.gov.pl.domain.station.GiosCommuneDto;
 import api.gios.gov.pl.domain.station.GiosStationDto;
-import api.gios.gov.pl.gios.cache.GiosCache;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Component
+@Slf4j
+@Primary
 public class MockGiosCache implements GiosCache {
 
     @Override
     public List<GiosStationDto> getStations() {
-        return Arrays.asList(new GiosStationDto(52, "Stacja 1", new GiosCityDto()));
+        return Arrays.asList(new GiosStationDto(52, "Stacja 1", new GiosCityDto(4, "City 4", new GiosCommuneDto())));
     }
 
     @Override
@@ -71,6 +74,18 @@ public class MockGiosCache implements GiosCache {
 
     @Override
     public void loadGiosData() {
+        // do nothing
+    }
 
+    @Override
+    public String getCityName(int cityId) {
+        return "City";
+    }
+
+    @Override
+    public Set<GiosCityDto> getAllCities() {
+        Set<GiosCityDto> cities = new HashSet<>();
+        cities.add(new GiosCityDto(4, "City 4", new GiosCommuneDto()));
+        return cities;
     }
 }

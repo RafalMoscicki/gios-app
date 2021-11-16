@@ -5,6 +5,8 @@ import api.gios.gov.pl.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(value = "/v1/subscription")
@@ -18,15 +20,15 @@ public class SubscriptionController {
         service.subscribe(subscription);
     }
 
-    @PutMapping
-    public void confirm(@RequestParam("subscriptionId") long subscriptionId,
+    @PostMapping("/confirmation")
+    public String confirm(@RequestParam("subscriptionId") long subscriptionId,
                         @RequestParam("token") String token) {
-        service.confirm(subscriptionId, token);
+        return service.confirm(subscriptionId, token);
     }
 
-    @DeleteMapping
-    public void unsubscribe(@RequestParam("subscriptionId") long subscriptionId,
+    @PostMapping("/cancel")
+    public String unsubscribe(@RequestParam("subscriptionId") long subscriptionId,
                             @RequestParam("token") String token) {
-        service.unsubscribe(subscriptionId, token);
+        return service.unsubscribe(subscriptionId, token);
     }
 }

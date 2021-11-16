@@ -3,7 +3,7 @@ package api.gios.gov.pl.controller;
 import api.gios.gov.pl.domain.CityDto;
 import api.gios.gov.pl.domain.GiosInfo;
 import api.gios.gov.pl.domain.sensor.ParamCodeDto;
-import api.gios.gov.pl.service.GiosService;
+import api.gios.gov.pl.service.GiosServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +16,10 @@ import java.util.Set;
 @RequestMapping(value = "/v1/gios")
 public class GiosController {
 
-    private final GiosService service;
+    private final GiosServiceImpl service;
 
     @Autowired
-    public GiosController(GiosService service) {
+    public GiosController(GiosServiceImpl service) {
         this.service = service;
     }
 

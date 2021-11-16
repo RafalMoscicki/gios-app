@@ -1,10 +1,12 @@
 package api.gios.gov.pl.domain;
 
 import api.gios.gov.pl.domain.sensor.ParamCode;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class GiosInfo {
 
     private final String stationName;
@@ -20,9 +22,5 @@ public class GiosInfo {
 
     public Map<ParamCode, GiosDetailInfo> getValues() {
         return values;
-    }
-
-    public String getStationName() {
-        return stationName;
     }
 }

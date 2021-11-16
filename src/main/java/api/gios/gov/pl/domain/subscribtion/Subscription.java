@@ -8,7 +8,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,10 +20,12 @@ public class Subscription implements Serializable {
     @GeneratedValue
     private long id;
 
+    @Column(name = "city_id")
     private int cityId;
 
     private String email;
 
+    @Column(name = "subscription_status")
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus subscriptionStatus;
 

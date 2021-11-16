@@ -1,6 +1,6 @@
 package api.gios.gov.pl.scheduler;
 
-import api.gios.gov.pl.gios.cache.GiosCacheImpl;
+import api.gios.gov.pl.gios.cache.GiosCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class GiosDataScheduler {
 
-    private final GiosCacheImpl giosCache;
+    private final GiosCache giosCache;
 
     @Scheduled(cron = "* 5 * * * *")
     private void loadData() {
