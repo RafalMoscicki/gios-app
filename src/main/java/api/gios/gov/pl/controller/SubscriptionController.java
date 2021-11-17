@@ -26,7 +26,7 @@ public class SubscriptionController {
         return service.confirm(subscriptionId, token);
     }
 
-    @PostMapping("/cancel")
+    @PostMapping("/cancellation")
     public String unsubscribe(@RequestParam("subscriptionId") long subscriptionId,
                             @RequestParam("token") String token) {
         return service.unsubscribe(subscriptionId, token);

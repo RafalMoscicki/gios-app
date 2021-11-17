@@ -6,8 +6,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Getter
-public class SubscriptionConfigConfig {
+public class AppConfig {
 
-    @Value("${subscription.url}")
-    private String subscriptionUrl;
+    @Value("${baseUrl}")
+    private String baseUrl;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Air quality report</title>
+
+  <style>
+        .inline {
+            display: inline;
+        }
+
+        .link-button {
+            background: none;
+            border: none;
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: serif;
+        }
+        .link-button:focus {
+            outline: none;
+        }
+        .link-button:active {
+            color:red;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+  <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;" th:text="${cityName}"></p>
+  <div class="row">
+    <div class="col-lg-10 mt-5 mb-5">
+      <p>Wartości średnie</p>
+      <table id="average" class="table table-bordered" style="width: 100%">
+        <thead>
+        <tr>
+          <th>Kod</th>
+          <th>Wartość</th>
+          <th>Poziom</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry, stats : ${average_report}" th:with="details=${entry.value}">
+          <td th:text="${entry.key}"></td>
+          <td th:text="${details.value}"></td>
+          <td th:text="${details.level}"></td>
+          <!--          <td th:text="${#dates.format(user.created, 'MMMM dd, yyyy')}">-->
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-10 mt-5 mb-5">
+      <p>Wartości szczegółowe ze stacji</p>
+      <table id="detail" class="table table-bordered" style="width: 100%">
+        <thead>
+        <tr>
+          <th>Stacja</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="report : ${gios_reports}">
+          <td th:text="${report.stationName}"></td>
+          <td>
+            <table>
+              <thead>
+              <tr>
+                <th>Kod</th>
+                <th>Wartość</th>
+                <th>Poziom</th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr th:each="entry, stats : ${report.values}" th:with="details=${entry.value}">
+                  <td th:text="${entry.key}"></td>
+                  <td th:text="${details.value}"></td>
+                  <td th:text="${details.level}"></td>
+                  <!--          <td th:text="${#dates.format(user.created, 'MMMM dd, yyyy')}">-->
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div>
+  <form method="post" th:action="@{${cancelLink}}" class="inline">
+    W celu dezaktywacji subskrypcji, proszę kliknąć w link
+    <button type="submit" name="submit_param" value="submit_value" class="link-button">
+      Anuluj subskrypcję
+    </button>
+  </form>
+</div>
+
+</body>
+</html>

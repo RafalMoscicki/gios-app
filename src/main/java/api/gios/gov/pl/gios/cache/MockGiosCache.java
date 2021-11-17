@@ -16,9 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
 @Slf4j
-@Primary
 public class MockGiosCache implements GiosCache {
 
     @Override

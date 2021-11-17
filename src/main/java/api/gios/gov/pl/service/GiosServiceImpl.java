@@ -85,7 +85,7 @@ public class GiosServiceImpl implements GiosService {
                 .collect(Collectors.toList());
     }
 
-    public Collection<GiosInfo> getReport(int cityId) {
+    public List<GiosInfo> getReport(int cityId) {
         return getStationIds(cityId).stream()
                 .map(this::getInfo)
                 .collect(Collectors.toList());
@@ -103,6 +103,7 @@ public class GiosServiceImpl implements GiosService {
                     Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
                         .map(e -> e.getValue().getValue())
                         .filter(Objects::nonNull)
+                        .filter(value -> !value.isNaN())
                         .mapToDouble(x -> x).average()
                         .orElse(Double.NaN)
                     )

@@ -1,6 +1,5 @@
 package api.gios.gov.pl.service;
 
-import api.gios.gov.pl.config.SubscriptionConfigConfig;
 import api.gios.gov.pl.domain.subscribtion.Subscription;
 import api.gios.gov.pl.domain.subscribtion.SubscriptionDto;
 import api.gios.gov.pl.domain.subscribtion.SubscriptionStatus;
@@ -29,7 +28,7 @@ public class SubscriptionService {
     private GiosEmailService giosEmailService;
 
     @Autowired
-    private SubscriptionConfigConfig subscriptionConfigConfig;
+    private ContentCreatorService contentCreatorService;
 
     public void subscribe(SubscriptionDto subscription) {
         List<Subscription> byEmailAndCityId = repository.findByEmailAndCityId(
@@ -41,8 +40,7 @@ public class SubscriptionService {
         Subscription newSubscription = new Subscription(subscription.getCityId(), subscription.getEmail(), SubscriptionStatus.PENDING, UUID.randomUUID().toString());
         log.info("subscription " + subscription + " created");
         repository.save(newSubscription);
-        String link = subscriptionConfigConfig.getSubscriptionUrl() + "/confirmation?subscriptionId=" + newSubscription.getId() + "&token=" + newSubscription.getToken();
-        giosEmailService.sendConfirmationEmail(newSubscription, link);
+        giosEmailService.sendConfirmationEmail(newSubscription);
     }
 
     public String confirm(long subscriptionId, String token) {
@@ -52,7 +50,7 @@ public class SubscriptionService {
             if (subscription.getToken().substring(0, 36).equals(token)) {
                 subscription.setSubscriptionStatus(SubscriptionStatus.ACTIVE);
                 log.info("subscription " + subscriptionId + " confirmed");
-                return "Dzięki za suba";
+                return contentCreatorService.createResponseMessage("Subskrypcja potwierdzona");
             } else {
                 throw new SubscriptionTokenNotValidException(token);
             }
@@ -68,7 +66,7 @@ public class SubscriptionService {
             if (subscription.getToken().substring(0, 36).equals(token)) {
                 log.info("subscription " + subscriptionId + " deleted");
                 repository.deleteById(subscriptionId);
-                return "Subscrybcja wycofana";
+                return contentCreatorService.createResponseMessage("Subskrypcja anulowana");
             } else {
                 throw new SubscriptionTokenNotValidException(token);
             }

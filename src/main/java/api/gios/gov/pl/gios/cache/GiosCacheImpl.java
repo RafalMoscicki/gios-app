@@ -10,11 +10,13 @@ import api.gios.gov.pl.exception.CityNotFoundException;
 import api.gios.gov.pl.gios.client.GiosClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Component
 public class GiosCacheImpl implements GiosCache {
 
     private final GiosClient client;

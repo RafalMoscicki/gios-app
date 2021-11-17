@@ -19,30 +19,29 @@ public class GiosEmailService {
     private final SimpleEmailService simpleEmailService;
     private final SubscriptionRepository subscriptionRepository;
     private final GiosCache giosCache;
-    private final MailCreatorService mailCreatorService;
+    private final ContentCreatorService contentCreatorService;
 
-    public void sendInformationEmail(String baseUrl) {
+    public void sendInformationEmail() {
         subscriptionRepository.findAll().stream()
                 .filter(subscription -> subscription.getSubscriptionStatus().equals(SubscriptionStatus.ACTIVE))
-                .forEach(subscription -> sendReportMail(subscription, baseUrl));
+                .forEach(this::sendReportMail);
     }
 
-    public void sendConfirmationEmail(Subscription subscription, String confirmationLink) {
+    public void sendConfirmationEmail(Subscription subscription) {
         simpleEmailService.send(Mail.builder()
                 .cityId(subscription.getCityId())
                 .mailTo(subscription.getEmail())
                 .subject("Subscription confirmation")
-                .message(mailCreatorService.sendConfirmationEmail(confirmationLink)).build());
+                .message(contentCreatorService.createConfirmation(subscription)).build());
     }
 
-    private void sendReportMail(Subscription subscription, String baseUrl) {
-        String cancelLink = baseUrl + "/cancel?subscriptionId=" + subscription.getId() + "&token=" + subscription.getToken();
+    private void sendReportMail(Subscription subscription) {
         simpleEmailService.send(
                 Mail.builder()
                         .cityId(subscription.getCityId())
                         .mailTo(subscription.getEmail())
                         .subject(SUBJECT + giosCache.getCityName(subscription.getCityId()))
-                        .message(mailCreatorService.buildReport(giosCache.getCityName(subscription.getCityId()), subscription.getCityId(), cancelLink))
+                        .message(contentCreatorService.createReport(giosCache.getCityName(subscription.getCityId()), subscription.getCityId(), subscription))
                         .build()
         );
     }

@@ -27,7 +27,7 @@ public interface GiosService {
 
     List<Integer> getStationIds(int cityId);
 
-    Collection<GiosInfo> getReport(int cityId);
+    List<GiosInfo> getReport(int cityId);
 
     GiosInfo getAverageReport(int cityId);
 
