@@ -1,16 +1,77 @@
 <!DOCTYPE HTML>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Air quality report</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Air quality report</title>
+    <style>
+        table {
+         table-layout: fixed;
+        }
+        table th {
+          background-color:grey;color:black;
+        }
+        .fixed-width {
+          width: 100px;
+        }
+        .col-12 {
+          width: 100%;
+        }
+        .col-11 {
+          width: 91.666666667%;
+        }
+        .col-10 {
+          width: 83.333333333%;
+        }
+        .col-9 {
+          width: 75%;
+        }
+        .col-8 {
+          width: 66.666666667%;
+        }
+        .col-7 {
+          width: 58.333333333%;
+        }
+        .col-6 {
+          width: 50%;
+        }
+        .col-5 {
+          width: 41.666666667%;
+        }
+        .col-4 {
+          width: 33.333333333%;
+        }
+        .col-3 {
+          width: 25%;
+        }
+        .col-2 {
+          width: 16.666666667%;
+        }
+        .col-1 {
+          width: 8.3333333333%;
+        }
 
-  <style>
+        /* Stylistic improvements from here */
+
+        .align-left {
+          text-align: left;
+        }
+        .align-right {
+          text-align: right;
+        }
+        table {
+          width: 100%;
+        }
+        table > tbody > tr > td,
+        table > thead > tr > th {
+          padding: 8px;
+          border: 1px solid gray;
+        }
         .inline {
             display: inline;
         }
-
         .link-button {
             background: none;
             border: none;
@@ -26,82 +87,93 @@
         .link-button:active {
             color:red;
         }
-    </style>
 
+
+    </style>
 </head>
+
 <body>
 
 <div class="container">
-  <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;" th:text="${cityName}"></p>
-  <div class="row">
-    <div class="col-lg-10 mt-5 mb-5">
-      <p>Wartości średnie</p>
-      <table id="average" class="table table-bordered" style="width: 100%">
-        <thead>
-        <tr>
-          <th>Kod</th>
-          <th>Wartość</th>
-          <th>Poziom</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="entry, stats : ${average_report}" th:with="details=${entry.value}">
-          <td th:text="${entry.key}"></td>
-          <td th:text="${details.value}"></td>
-          <td th:text="${details.level}"></td>
-          <!--          <td th:text="${#dates.format(user.created, 'MMMM dd, yyyy')}">-->
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-lg-10 mt-5 mb-5">
-      <p>Wartości szczegółowe ze stacji</p>
-      <table id="detail" class="table table-bordered" style="width: 100%">
-        <thead>
-        <tr>
-          <th>Stacja</th>
-          <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="report : ${gios_reports}">
-          <td th:text="${report.stationName}"></td>
-          <td>
-            <table>
-              <thead>
-              <tr>
-                <th>Kod</th>
-                <th>Wartość</th>
-                <th>Poziom</th>
-              </tr>
-              </thead>
-              <tbody>
-                <tr th:each="entry, stats : ${report.values}" th:with="details=${entry.value}">
-                  <td th:text="${entry.key}"></td>
-                  <td th:text="${details.value}"></td>
-                  <td th:text="${details.level}"></td>
-                  <!--          <td th:text="${#dates.format(user.created, 'MMMM dd, yyyy')}">-->
+    <h2 th:text="${cityName} + ', ' + ${#temporals.format(dateTime, 'dd-MM-yyyy HH:mm')}"></h2>
+    <div class="row">
+        <div class="col-lg-10 mt-5 mb-5">
+            <h3 style="color:red">Wartości średnie</h3>
+            <table id="average" cellpadding="0" cellspacing="0" border="0">
+                <colgroup>
+                    <col class="col-4"/>
+                    <col class="col-4"/>
+                    <col class="col-4"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Kod</th>
+                    <th>Wartość</th>
+                    <th>Poziom</th>
                 </tr>
-              </tbody>
+                </thead>
+                <tbody>
+                <tr th:each="entry, stats : ${average_report}" th:with="details=${entry.value}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${#strings.equals('NaN', #strings.toString(details.value)) ? 'Brak danych' : #numbers.formatDecimal(details.value, 1, 2)}"></td>
+                    <td th:text="${details.level}"></td>
+                </tr>
+                </tbody>
             </table>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+        </div>
     </div>
-  </div>
+
+    <div class="row">
+        <div class="col-lg-10 mt-5 mb-5">
+            <h3 style="color:red">Wartości szczegółowe ze stacji</h3>
+            <table id="detail" cellpadding="0" cellspacing="0" border="0">
+                <colgroup>
+                    <col class="col-4"/>
+                    <col class="col-8"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Stacja</th>
+                    <th>Odczyty</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="report : ${gios_reports}">
+                    <td th:text="${report.stationName}"></td>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <thead>
+                            <tr>
+                                <th>Kod</th>
+                                <th>Wartość</th>
+                                <th>Poziom</th>
+                                <th>Czas odczytu</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="entry, stats : ${report.values}" th:with="details=${entry.value}">
+                                <td th:text="${entry.key}"></td>
+                                <td th:text="${#strings.equals('NaN', #strings.toString(details.value)) ? 'Brak danych' : #numbers.formatDecimal(details.value, 1, 2)}"></td>
+                                <td th:text="${details.level}"></td>
+                                <td th:text="${#temporals.format(details.temporal, 'dd-MM-yyyy HH:mm')}">
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <div>
-  <form method="post" th:action="@{${cancelLink}}" class="inline">
-    W celu dezaktywacji subskrypcji, proszę kliknąć w link
-    <button type="submit" name="submit_param" value="submit_value" class="link-button">
-      Anuluj subskrypcję
-    </button>
-  </form>
+    <form method="post" th:action="@{${cancelLink}}" class="inline">
+        W celu dezaktywacji subskrypcji, proszę kliknąć w link
+        <button type="submit" name="submit_param" value="submit_value" class="link-button">
+            Anuluj subskrypcję
+        </button>
+    </form>
 </div>
 
 </body>
